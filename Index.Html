@@ -1,205 +1,797 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lelang GTPS • modern</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui}
-body{background:#f6f9fe;display:flex;justify-content:center;padding:1rem}
-.gtps-app{max-width:860px;width:100%;background:#fff;border-radius:30px;box-shadow:0 20px 40px -10px rgba(0,0,0,.25);overflow:hidden}
-.header{display:flex;justify-content:space-between;align-items:center;padding:1.5rem}
-.header h1{font-size:1.8rem;color:#0a3a66}
-.nav{display:flex;border-bottom:1px solid #ddd}
-.nav button{flex:1;padding:1rem;border:none;background:#fff;cursor:pointer;font-weight:600}
-.nav button.active{background:#f0f7ff;color:#0a58ca}
-.panel{display:none;padding:1.5rem}
-.panel.active{display:block}
-.input{width:100%;padding:.8rem;border-radius:50px;border:1px solid #ccc;margin-bottom:1rem}
-.btn{padding:.8rem 1.5rem;border:none;border-radius:50px;background:#0a3a66;color:#fff;cursor:pointer}
-.auction-box{background:#f5f9ff;padding:1.5rem;border-radius:20px;margin-bottom:1rem}
-.big{font-size:2rem;font-weight:700}
-.timer{background:#e3efff;padding:1rem;border-radius:50px;text-align:center;font-weight:600}
-.chat-box{height:250px;overflow:auto;background:#f5faff;padding:1rem;border-radius:20px;margin-bottom:1rem}
-.chat-bubble{background:#fff;padding:.6rem 1rem;border-radius:20px;margin-bottom:.5rem;border:1px solid #ddd}
-.chat-bubble.own{background:#d9ebff}
-.history{background:#f5faff;padding:1rem;border-radius:20px;max-height:200px;overflow:auto}
-</style>
-</head>
-<body>
-<div class="gtps-app">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MeatBET • GTPS Casino</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
-<div class="header">
-<h1>LELANG GTPS</h1>
-<div onclick="switchPanel('profile')" style="cursor:pointer;font-weight:600" id="growidDisplay">PlayerGTPS</div>
-</div>
+        body {
+            background-color: #0a0404;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
 
-<div class="nav">
-<button id="tabProfile" class="active" onclick="switchPanel('profile')">Profil</button>
-<button id="tabAuction" onclick="switchPanel('auction')">Lelang</button>
-<button id="tabChat" onclick="switchPanel('chat')">Chat</button>
-<button id="tabBid" onclick="switchPanel('bid')">Bid</button>
-</div>
+        .website-container {
+            max-width: 420px;
+            width: 100%;
+            background-color: #100808;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(255, 0, 0, 0.15);
+            overflow: hidden;
+            border: 1px solid #301010;
+            position: relative;
+        }
 
-<div id="panelProfile" class="panel active">
-<input class="input" id="growidInput" placeholder="GrowID">
-<button class="btn" onclick="saveProfile()">Simpan</button>
-<br><br>
-<input type="password" id="ownerPass" class="input" placeholder="Owner Password">
-<button class="btn" onclick="ownerLogin()">Login Owner</button>
+        .content {
+            padding: 16px 16px 12px;
+        }
 
-<div id="ownerPanel" style="display:none;margin-top:1rem">
-<input class="input" id="itemName" placeholder="Nama Item">
-<input class="input" id="itemQty" placeholder="Jumlah">
-<input class="input" id="itemImg" placeholder="URL Gambar">
-<input class="input" id="duration" placeholder="Durasi (menit)">
-<button class="btn" onclick="createAuction()">Mulai Lelang</button>
-</div>
-</div>
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
 
-<div id="panelAuction" class="panel">
-<div class="auction-box">
-<img id="displayImg" src="https://placehold.co/120x120" width="100">
-<h2 id="displayItem">-</h2>
-Jumlah: <span id="displayQty">0</span>
-</div>
-<div class="big"><span id="highestBid">0</span> BGL</div>
-Highest: <span id="highestBidder">-</span>
-<div class="timer" id="timer">--</div>
-</div>
+        .profile-mini {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(145deg, #c02020, #8b0000);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #a03030;
+            font-weight: 800;
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 4px 0 #4a0000;
+            transition: all 0.2s;
+        }
 
-<div id="panelChat" class="panel">
-<div class="chat-box" id="chatMessages"></div>
-<input class="input" id="chatInput" placeholder="Tulis pesan">
-<button class="btn" onclick="sendChat()">Kirim</button>
-</div>
+        .profile-mini:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #4a0000;
+        }
 
-<div id="panelBid" class="panel">
-<input type="number" class="input" id="bidAmount" placeholder="Jumlah">
-<select class="input" id="currency">
-<option value="BGL">BGL</option>
-<option value="DL">DL</option>
-<option value="WL">WL</option>
-</select>
-<button class="btn" onclick="placeBid()">Bid</button>
-<br><br>
-<div class="history" id="bidHistory"></div>
-</div>
+        .balance-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            background: linear-gradient(145deg, #1e0c0c, #140808);
+            padding: 6px 12px;
+            border-radius: 40px;
+            border: 1px solid #501010;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            cursor: pointer;
+        }
 
-</div>
+        .balance-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #2a1414;
+            padding: 4px 8px;
+            border-radius: 30px;
+            border: 1px solid #601010;
+        }
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, update, push, onValue, onChildAdded, get, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        .balance-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            order: 1;
+        }
 
-const firebaseConfig = {
-apiKey:"AIzaSyC8QrDc5NiyyEZwl8sqBSVEPkymTkpgOiU",
-authDomain:"leetopia-auction.firebaseapp.com",
-databaseURL:"https://leetopia-auction-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId:"leetopia-auction",
-storageBucket:"leetopia-auction.firebasestorage.app",
-messagingSenderId:"396746559389",
-appId:"1:396746559389:web:21fa42ddc49366b6106974"
-};
+        .balance-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
+        .balance-text {
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            order: 0;
+        }
 
-let currentGrowID=localStorage.getItem("growid")||"PlayerGTPS";
-document.getElementById("growidInput").value=currentGrowID;
-document.getElementById("growidDisplay").innerText=currentGrowID;
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
 
-window.switchPanel=function(p){
-document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
-document.getElementById("panel"+capitalize(p)).classList.add("active");
-document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
-document.getElementById("tab"+capitalize(p)).classList.add("active");
-}
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-function capitalize(t){return t.charAt(0).toUpperCase()+t.slice(1)}
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, #c02020, #8b0000);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(200, 0, 0, 0.5);
+        }
 
-window.saveProfile=function(){
-const val=document.getElementById("growidInput").value.trim();
-if(val){currentGrowID=val;localStorage.setItem("growid",val);
-document.getElementById("growidDisplay").innerText=val;}
-}
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
 
-window.ownerLogin=function(){
-if(document.getElementById("ownerPass").value==="12345"){
-document.getElementById("ownerPanel").style.display="block";
-}else alert("Password salah");
-}
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            color: #f0d0d0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 5px rgba(255,0,0,0.3);
+        }
 
-window.createAuction=function(){
-const name=itemName.value;
-const qty=itemQty.value;
-const img=itemImg.value;
-const duration=parseInt(document.getElementById("duration").value)||5;
-const endTime=Date.now()+duration*60000;
-set(ref(db,"auction/current"),{itemName:name,itemQty:qty,imageUrl:img,highestBid:0,highestBidder:"-",endTime});
-set(ref(db,"bids"),null);
-}
+        .notification-btn {
+            width: 44px;
+            height: 44px;
+            background-color: #1e0c0c;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #601010;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-function convert(a,c){if(c==="DL")return a*100;if(c==="WL")return a/100;return a}
+        .notification-btn:hover {
+            background-color: #2a1414;
+            border-color: #a03030;
+        }
 
-window.placeBid=function(){
-const amt=parseFloat(bidAmount.value);
-if(!amt)return;
-const cur=currency.value;
-const bidVal=convert(amt,cur);
-get(ref(db,"auction/current")).then(s=>{
-const d=s.val();if(!d)return;
-if(Date.now()>d.endTime)return alert("Lelang selesai");
-if(bidVal>d.highestBid){
-update(ref(db,"auction/current"),{highestBid:bidVal,highestBidder:currentGrowID});
-push(ref(db,"bids"),{growid:currentGrowID,amount:bidVal});
-}else alert("Bid harus lebih tinggi");
-});
-}
+        .notification-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: #d06060;
+        }
 
-let timerInt=null;
-onValue(ref(db,"auction/current"),s=>{
-const d=s.val();
-if(!d)return;
-displayItem.innerText=d.itemName||"-";
-displayQty.innerText=d.itemQty||0;
-displayImg.src=d.imageUrl||"https://placehold.co/120x120";
-highestBid.innerText=d.highestBid||0;
-highestBidder.innerText=d.highestBidder||"-";
-if(timerInt)clearInterval(timerInt);
-timerInt=setInterval(()=>{
-const r=d.endTime-Date.now();
-if(r<=0){timer.innerText="Selesai";clearInterval(timerInt);}
-else{timer.innerText=Math.floor(r/60000)+"m "+Math.floor((r%60000)/1000)+"s";}
-},500);
-});
+        /* Welcome section */
+        .welcome-section {
+            margin-bottom: 16px;
+            text-align: center;
+            background: linear-gradient(145deg, #1e0c0c, #140808);
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid #501010;
+        }
 
-const hist=document.getElementById("bidHistory");
-onChildAdded(query(ref(db,"bids"),limitToLast(20)),s=>{
-const b=s.val();if(!b)return;
-const div=document.createElement("div");
-div.className="chat-bubble";
-div.innerText=b.growid+" : "+b.amount+" BGL";
-hist.prepend(div);
-});
+        .welcome-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f0b0b0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-const chatDiv=document.getElementById("chatMessages");
-window.sendChat=function(){
-const text=chatInput.value.trim();
-if(!text)return;
-push(ref(db,"chat"),{growid:currentGrowID,message:text});
-chatInput.value="";
-}
-onChildAdded(query(ref(db,"chat"),limitToLast(50)),s=>{
-const c=s.val();if(!c)return;
-const div=document.createElement("div");
-div.className="chat-bubble"+(c.growid===currentGrowID?" own":"");
-div.innerHTML="<b>"+c.growid+"</b><br>"+c.message;
-chatDiv.appendChild(div);
-chatDiv.scrollTop=chatDiv.scrollHeight;
-});
-</script>
+        .welcome-text span {
+            color: #d03030;
+            font-weight: 800;
+            font-size: 22px;
+            display: block;
+            margin-top: 4px;
+        }
 
-</body>
-</html>
+        /* Lihat ini */
+        .lihat-ini-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .lihat-ini-header h3 {
+            color: #f0b0b0;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .arrow-btn {
+            color: #b05050;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Cards */
+        .bonus-cards {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .bonus-card {
+            flex: 1;
+            background: linear-gradient(145deg, #1e0c0c, #140808);
+            border: 1.5px solid #501010;
+            border-radius: 18px;
+            padding: 14px 8px 12px;
+            position: relative;
+            box-shadow: 0 5px 0 #080202;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bonus-card:hover {
+            transform: translateY(-2px);
+            border-color: #a03030;
+        }
+
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            background-color: #2a1414;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            border: 1px solid #a03030;
+        }
+
+        .card-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: #e07070;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .card-desc {
+            color: #b07878;
+            font-size: 10px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            line-height: 1.3;
+            min-height: 25px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #401010;
+            padding-top: 8px;
+        }
+
+        .reward-badge {
+            background-color: #2a1010;
+            padding: 3px 6px;
+            border-radius: 20px;
+            border: 1px solid #a03030;
+        }
+
+        .reward-badge span {
+            color: #f0a0a0;
+            font-weight: 700;
+            font-size: 9px;
+        }
+
+        .arrow-right {
+            color: #c06060;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .menu-item {
+            background: linear-gradient(145deg, #1e0c0c, #140808);
+            border: 1.5px solid #501010;
+            border-radius: 18px;
+            padding: 16px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 5px 0 #080202;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-2px);
+            border-color: #a03030;
+        }
+
+        .menu-icon {
+            width: 50px;
+            height: 50px;
+            background: #2a1414;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            border: 2px solid #a03030;
+        }
+
+        .menu-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: #e07070;
+        }
+
+        .menu-title {
+            color: white;
+            font-weight: 800;
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .menu-desc {
+            color: #b07878;
+            font-size: 10px;
+        }
+
+        /* Crash Game */
+        .crash-container {
+            background: #2a1414;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #601010;
+            text-align: center;
+        }
+
+        .crash-multiplier {
+            font-size: 64px;
+            font-weight: 800;
+            color: #4caf50;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+
+        .crash-multiplier.crashed {
+            color: #f44336;
+        }
+
+        .crash-history {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 16px 0;
+            justify-content: center;
+        }
+
+        .crash-history-item {
+            background: #1e0c0c;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .crash-history-item.win {
+            color: #4caf50;
+        }
+
+        .crash-history-item.lose {
+            color: #f44336;
+        }
+
+        /* Limbo Game */
+        .limbo-container {
+            background: #2a1414;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #601010;
+            text-align: center;
+        }
+
+        .limbo-result {
+            font-size: 64px;
+            font-weight: 800;
+            color: #ff9800;
+            text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+            margin: 20px 0;
+        }
+
+        .limbo-range {
+            display: flex;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .limbo-range input[type=range] {
+            flex: 1;
+            height: 40px;
+            background: #1e0c0c;
+            border-radius: 20px;
+            color: white;
+        }
+
+        .limbo-range input[type=number] {
+            width: 80px;
+            height: 40px;
+            background: #1e0c0c;
+            border: 1px solid #601010;
+            border-radius: 20px;
+            color: white;
+            padding: 0 15px;
+        }
+
+        /* HiLo Game (formerly Gems) */
+        .hilo-container {
+            background: #2a1414;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #601010;
+        }
+
+        .hilo-card {
+            background: #1e0c0c;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 10px 0;
+            border: 2px solid #a03030;
+        }
+
+        .hilo-number {
+            font-size: 72px;
+            font-weight: 800;
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin: 20px 0;
+        }
+
+        .hilo-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .hilo-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: none;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .hilo-btn.high {
+            background: linear-gradient(145deg, #4caf50, #2e7d32);
+            color: white;
+            box-shadow: 0 5px 0 #1b5e20;
+        }
+
+        .hilo-btn.low {
+            background: linear-gradient(145deg, #f44336, #c62828);
+            color: white;
+            box-shadow: 0 5px 0 #8b0000;
+        }
+
+        .hilo-btn:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+
+        .hilo-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hilo-multiplier {
+            text-align: center;
+            font-size: 18px;
+            color: #ffd700;
+            margin: 10px 0;
+        }
+
+        /* Keno Game */
+        .keno-container {
+            background: #2a1414;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #601010;
+        }
+
+        .keno-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .keno-cell {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, #3a1c1c, #2a1414);
+            border: 2px solid #601010;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .keno-cell.selected {
+            background: linear-gradient(145deg, #4caf50, #2e7d32);
+            border-color: #4caf50;
+        }
+
+        .keno-cell:hover {
+            transform: scale(0.95);
+            border-color: #c04040;
+        }
+
+        .keno-cell:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .keno-draw {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ffd700;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Dice Game */
+        .dice-container {
+            background: #2a1414;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #601010;
+        }
+
+        .dice-result {
+            font-size: 64px;
+            font-weight: 800;
+            color: #ff9800;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .dice-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .dice-btn {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, #3a1c1c, #2a1414);
+            border: 2px solid #601010;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dice-btn.selected {
+            background: linear-gradient(145deg, #4caf50, #2e7d32);
+            border-color: #4caf50;
+        }
+
+        .dice-btn:hover {
+            transform: scale(0.95);
+            border-color: #c04040;
+        }
+
+        .dice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Mines Grid */
+        .mines-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 16px;
+            background: #2a1414;
+            padding: 12px;
+            border-radius: 18px;
+            border: 1px solid #601010;
+        }
+
+        .mine-cell {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, #3a1c1c, #2a1414);
+            border: 2px solid #601010;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 3px 0 #300808;
+        }
+
+        .mine-cell:hover {
+            transform: scale(0.95);
+            border-color: #c04040;
+        }
+
+        .mine-cell.revealed {
+            background: #1a0a0a;
+            border-color: #a03030;
+            box-shadow: none;
+            transform: translateY(3px);
+        }
+
+        .mine-cell.revealed.mine {
+            background: #8b0000;
+        }
+
+        .mine-cell.revealed.safe {
+            background: #2a5a2a;
+        }
+
+        /* Tower Grid */
+        .tower-grid {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 6px;
+            margin-bottom: 16px;
+            background: #2a1414;
+            padding: 12px;
+            border-radius: 18px;
+            border: 1px solid #601010;
+        }
+
+        .tower-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .tower-cell {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, #3a1c1c, #2a1414);
+            border: 2px solid #601010;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 3px 0 #300808;
+        }
+
+        .tower-cell:hover {
+            transform: scale(0.95);
+            border-color: #c04040;
+        }
+
+        .tower-cell.revealed {
+            background: #1a0a0a;
+            border-color: #a03030;
+            box-shadow: none;
+            transform: translateY(3px);
+        }
+
+        .tower-cell.revealed.mine {
+            background: #8b0000;
+        }
+
+        .tower-cell.revealed.safe {
+            background: #2a5a2a;
+        }
+
+        .tower-cell.revealed.next {
+            background: #3a6a3a;
+        }
+
+        /* Slot Machine */
+        .slot-container {
+            background: #2a1414;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #601010;
+        }
+
+        .slot-reels {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .slot-reel {
+            width: 80px;
+            height: 80px;
+            background: #1e0c0c;
+            border: 3px solid #a03030;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 800;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .slot-reel.spinning {
+            animation: spin 0.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .slot-paytable {
+            background: #1e0c0c;
+            border-radius: 12px;
+            padding: 10px;
+            margin: 15px 0;
+            font-size: 12px;
+        }
+
+        .slot-paytable div {
+            display: flex;
+            justify-content: space-between;
+            color: #b07878;
+            padding: 5px;
+        }
