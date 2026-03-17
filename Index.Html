@@ -2,1880 +2,878 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GrowGem • Casino</title>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- GSAP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickCoin - Mining & Claim</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #0f0d17; display: flex; justify-content: center; min-height: 100vh; }
-        .phone-frame { max-width: 375px; width: 100%; background-color: #13111c; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.8); min-height: 100vh; padding-bottom: 70px; }
-
-        .top-header {
-            display: flex; justify-content: space-between; align-items: center; padding: 16px;
-            background: #13111c; border-bottom: 1px solid #2a2734;
-        }
-        .logo-image {
-            width: 36px; height: 36px; border-radius: 10px; object-fit: cover;
-            box-shadow: 0 4px 0 #4a3f6e; cursor: pointer;
-        }
-        .balance-card {
-            background: #1e1b2a; border-radius: 40px; padding: 8px 20px;
-            display: flex; align-items: center; gap: 8px;
-            border: 1px solid #5f4b8b; cursor: pointer;
-        }
-        .balance-icon { width: 24px; height: 24px; object-fit: contain; }
-        .balance-amount { color: white; font-weight: 700; font-size: 18px; }
-
-        .auth-buttons { display: flex; gap: 8px; }
-        .btn-login, .btn-register {
-            padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px;
-            cursor: pointer; border: none;
-        }
-        .btn-login { background: #2a2734; color: white; border: 1px solid #5f4b8b; }
-        .btn-register { background: #7c5fcf; color: white; box-shadow: 0 4px 0 #4a3f6e; }
-
-        .user-avatar {
-            width: 40px; height: 40px; border-radius: 8px; background: #7c5fcf;
-            display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
-        }
-        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-        .home-page, .reme-page, .mines-page, .towers-page, .limbo-page, .bonus-page, .profile-page, .chat-page, .wallet-page, .gemslot-page { 
-            display: none; padding: 0 16px 20px; animation: fadeIn 0.3s; 
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .slider-section { padding: 20px 0; }
-        .slider-container {
-            display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory;
-        }
-        .slider-container::-webkit-scrollbar { display: none; }
-        .banner-card {
-            min-width: 280px; height: 140px; border-radius: 20px; overflow: hidden;
-            scroll-snap-align: start;
-        }
-        .banner-card img { width: 100%; height: 100%; object-fit: cover; }
-
-        .original-section { padding: 0 0 20px; }
-        .original-header {
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
-        }
-        .header-left h3 {
-            font-size: 22px; font-weight: 800;
-            background: linear-gradient(135deg, #c7b3ff, #9f7aea); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .game-grid-scroll { overflow-x: auto; scrollbar-width: none; margin-top: 8px; }
-        .game-grid-scroll::-webkit-scrollbar { display: none; }
-        .game-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; width: max-content;
-        }
-        .game-card {
-            width: 100px; aspect-ratio: 2/3; background: #1e1b2a; border-radius: 16px;
-            border: 1px solid #5f4b8b; overflow: hidden; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .game-card:hover { transform: translateY(-5px); border-color: #9f7aea; }
-        .game-card-img { width: 100%; height: 100%; display: block; object-fit: cover; }
-
-        .popular-section { padding: 0 0 16px 0; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .section-header h2 { font-size: 22px; font-weight: 800; color: #c7b3ff; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
         
-        .slot-row {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            padding: 4px 0;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
         }
-        .slot-row::-webkit-scrollbar { display: none; }
-        
-        .slot-card {
-            min-width: 100px;
-            width: 100px;
-            aspect-ratio: 2/3;
-            background: #1e1b2a;
-            border-radius: 16px;
-            border: 1px solid #5f4b8b;
+
+        .coin-btn {
+            background: linear-gradient(145deg, #ffd700, #ffb700);
+            box-shadow: 0 10px 30px rgba(255, 183, 0, 0.4), 
+                        inset 0 -5px 15px rgba(0,0,0,0.2),
+                        inset 0 5px 15px rgba(255,255,255,0.5);
+            transition: all 0.1s;
+            position: relative;
             overflow: hidden;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            flex-direction: column;
         }
-        .slot-card:hover { 
-            transform: translateY(-5px); 
-            border-color: #9f7aea; 
+        
+        .coin-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
-        .slot-card-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
+        
+        .coin-btn:active::before {
+            width: 300px;
+            height: 300px;
         }
-
-        /* ===== WALLET PAGE ===== */
-        .wallet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 20px 0;
-        }
-        .wallet-header h2 {
-            color: white;
-            font-size: 24px;
-            font-weight: 700;
-        }
-        .wallet-balance {
-            background: #1e1b2a;
-            border-radius: 20px;
-            padding: 20px;
-            border: 2px solid #7c5fcf;
-            margin-bottom: 20px;
-        }
-        .wallet-balance-label {
-            color: #7a7499;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-        .wallet-balance-amount {
-            font-size: 48px;
-            font-weight: 800;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .wallet-balance-amount img {
-            width: 40px;
-            height: 40px;
-        }
-        .wallet-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .wallet-card {
-            background: #1e1b2a;
-            border: 1px solid #2a2734;
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .wallet-card:hover {
-            border-color: #7c5fcf;
-            transform: translateY(-3px);
-        }
-        .wallet-card i {
-            font-size: 32px;
-            color: #7c5fcf;
-            margin-bottom: 12px;
-        }
-        .wallet-card-title {
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-        .wallet-card-desc {
-            color: #7a7499;
-            font-size: 12px;
-        }
-        .wallet-history {
-            background: #1e1b2a;
-            border-radius: 16px;
-            padding: 16px;
-            border: 1px solid #2a2734;
-        }
-        .wallet-history-title {
-            color: white;
-            font-weight: 600;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .wallet-history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #2a2734;
-        }
-        .wallet-history-item:last-child {
-            border-bottom: none;
-        }
-        .wallet-history-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .wallet-history-icon {
-            width: 36px;
-            height: 36px;
-            background: #2a2734;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #c7b3ff;
-        }
-        .wallet-history-info h4 {
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .wallet-history-info p {
-            color: #7a7499;
-            font-size: 11px;
-        }
-        .wallet-history-amount {
-            font-weight: 700;
-            font-size: 16px;
-        }
-        .wallet-history-amount.plus { color: #2fb77e; }
-        .wallet-history-amount.minus { color: #f25a5a; }
-
-        /* ===== PROMO BUTTON ===== */
-        .promo-header-btn {
-            background: linear-gradient(135deg, #7c5fcf, #9f7aea);
-            border: none;
-            border-radius: 30px;
-            padding: 10px 18px;
-            color: white;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 0 #4a3f6e;
-        }
-        .promo-header-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #4a3f6e;
-        }
-        .promo-header-btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #4a3f6e;
+        
+        .coin-btn:active {
+            transform: scale(0.95);
         }
 
-        /* ===== PROMO MODAL ===== */
-        .promo-modal {
+        .coin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .floating-coin {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            font-size: 20px;
+            z-index: 9999;
+            font-weight: bold;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(1.3);
+            }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 4000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .promo-modal.active { display: flex; }
-        .promo-content {
-            background: #1e1b2a;
-            border-radius: 30px;
-            padding: 30px 25px;
-            width: 90%;
-            max-width: 340px;
-            border: 3px solid #7c5fcf;
-            position: relative;
-        }
-        .promo-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            color: #7a7499;
-            font-size: 28px;
-            cursor: pointer;
-        }
-        .promo-content h2 {
-            color: white;
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            text-align: center;
-            background: linear-gradient(135deg, #c7b3ff, #9f7aea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .promo-input-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-        .promo-input {
-            flex: 1;
-            background: #2a2734;
-            border: 2px solid #5f4b8b;
-            border-radius: 16px;
-            padding: 16px;
-            color: white;
-            font-size: 16px;
-            text-transform: uppercase;
-            outline: none;
-        }
-        .promo-input:focus {
-            border-color: #7c5fcf;
-            box-shadow: 0 0 20px #7c5fcf;
-        }
-        .promo-submit {
-            background: #7c5fcf;
-            border: none;
-            border-radius: 16px;
-            width: 60px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .promo-submit i {
-            font-size: 24px;
-        }
-        .promo-info-box {
-            background: #2a2734;
-            border-radius: 16px;
-            padding: 16px;
-            border-left: 4px solid #f0b90b;
-            font-size: 13px;
-            color: #c7b3ff;
-        }
-        .promo-info-box p {
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .promo-info-box p:last-child { margin-bottom: 0; }
-        .promo-info-box i { color: #f0b90b; width: 20px; }
 
-        /* ===== LIVE BETS SECTION ===== */
-        .live-bets-section {
-            background: #1e1b2a;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 0 0 16px 0;
-            border: 1px solid #2a2734;
-        }
-        .live-bets-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        .live-bets-header i { color: #f0b90b; font-size: 18px; }
-        .live-bets-header span { color: white; font-weight: 600; font-size: 14px; }
-        .live-bets-container { display: flex; flex-direction: column; gap: 8px; }
-        .live-bet-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #2a2734;
-            border-radius: 8px;
-            padding: 8px 12px;
-            border-left: 3px solid;
-        }
-        .live-bet-item.win { border-left-color: #2fb77e; }
-        .live-bet-item.lose { border-left-color: #f25a5a; }
-        .live-bet-left { display: flex; align-items: center; gap: 8px; }
-        .live-bet-game { font-weight: 600; color: white; font-size: 12px; min-width: 40px; }
-        .live-bet-user { display: flex; align-items: center; gap: 4px; }
-        .live-bet-username { color: #c7b3ff; font-weight: 600; font-size: 12px; }
-        .live-bet-tier { width: 14px; height: 14px; object-fit: contain; }
-        .live-bet-right { display: flex; align-items: center; gap: 12px; }
-        .live-bet-amount { display: flex; align-items: center; gap: 3px; }
-        .live-bet-amount img { width: 12px; height: 12px; object-fit: contain; }
-        .live-bet-amount span { color: white; font-weight: 600; font-size: 12px; }
-        .live-bet-payout { font-weight: 700; font-size: 12px; min-width: 40px; text-align: right; }
-        .live-bet-payout.win { color: #2fb77e; }
-        .live-bet-payout.lose { color: #f25a5a; }
-
-        /* ===== GEM SLOT PAGE ===== */
-        .gemslot-page {
-            padding: 0 12px 20px;
-        }
-        
-        .gemslot-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 16px 0;
-        }
-        
-        .gemslot-header img {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            border: 2px solid #7c5fcf;
-        }
-        
-        .gemslot-header h2 {
-            color: white;
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #c7b3ff, #9f7aea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .gemslot-machine {
-            background: #1e1b2a;
-            border-radius: 20px;
-            padding: 20px 12px;
-            border: 2px solid #5f4b8b;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 0 #2a1f3a;
-        }
-        
-        .gemslot-window {
-            background: #0f0d17;
-            border-radius: 16px;
-            padding: 16px 8px;
-            border: 1px solid #5f4b8b;
-        }
-        
-        .gemslot-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .gemslot-row {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .gemslot-cell {
-            width: 55px;
-            height: 55px;
+        /* Kupon Styles */
+        .kupon-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border: 3px dashed #fbbf24;
             position: relative;
             overflow: hidden;
-            border-radius: 10px;
-            background: #1a1723;
-            border: 2px solid #3a2a5a;
         }
         
-        .gemslot-reel {
+        .kupon-card::before {
+            content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            will-change: transform;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(251, 191, 36, 0.1) 10px,
+                rgba(251, 191, 36, 0.1) 20px
+            );
         }
-        
-        .gemslot-reel-item {
-            height: 55px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #1e1b2a;
-            border-bottom: 1px solid #2a2734;
+
+        .kupon-number {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
-        
-        .gemslot-reel-item img {
-            width: 35px;
-            height: 35px;
-            object-fit: contain;
-        }
-        
-        .gemslot-overlay {
+
+        .kupon-watermark {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(180deg, 
-                rgba(15,13,23,0.8) 0%, 
-                transparent 20%, 
-                transparent 80%, 
-                rgba(15,13,23,0.8) 100%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 48px;
+            opacity: 0.1;
+            font-weight: bold;
             pointer-events: none;
         }
-        
-        .gemslot-payout {
-            background: #1e1b2a;
-            border-radius: 12px;
-            padding: 14px 16px;
-            border: 1px solid #5f4b8b;
-            margin-bottom: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .gemslot-payout-label {
-            color: #c7b3ff;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .gemslot-payout-value {
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-        }
-        
-        /* Bonus Info Panel */
-        .gemslot-bonus-info {
-            background: #2a2734;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 16px;
-            border: 1px solid #7c5fcf;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .gemslot-bonus-info-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .gemslot-bonus-info-item i {
-            color: #7c5fcf;
-            font-size: 20px;
-        }
-        
-        .gemslot-bonus-info-text {
-            color: white;
-            font-weight: 600;
-        }
-        
-        .gemslot-bonus-info-text span {
-            color: #f0b90b;
-            font-size: 18px;
-            margin-left: 4px;
-        }
-        
-        .gemslot-control {
-            background: #1e1b2a;
-            border-radius: 16px;
-            padding: 16px;
-            border: 1px solid #5f4b8b;
-            margin-bottom: 16px;
-        }
-        
-        .gemslot-bet {
-            margin-bottom: 16px;
-        }
-        
-        .gemslot-bet-label {
-            color: #c7b3ff;
-            font-size: 14px;
-            margin-bottom: 8px;
-            display: block;
-        }
-        
-        .gemslot-bet-input {
-            width: 100%;
-            background: #2a2734;
-            border: 1px solid #5f4b8b;
-            border-radius: 12px;
-            padding: 12px 16px;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            outline: none;
-        }
-        
-        .gemslot-bet-input:focus {
-            border-color: #7c5fcf;
-        }
-        
-        .gemslot-bet-input:disabled {
-            opacity: 0.5;
-        }
-        
-        .gemslot-bonus-section {
-            background: #2a2734;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 16px;
-            border: 1px solid #7c5fcf;
-        }
-        
-        .gemslot-bonus-title {
-            color: #7c5fcf;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .gemslot-bonus-grid {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .gemslot-bonus-btn {
-            flex: 1;
-            background: #1e1b2a;
-            border: 1px solid #5f4b8b;
-            border-radius: 10px;
-            padding: 10px;
-            color: white;
-            font-size: 13px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        
-        .gemslot-bonus-btn:hover:not(:disabled) {
-            background: #35324a;
-            border-color: #7c5fcf;
-        }
-        
-        .gemslot-bonus-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        
-        .gemslot-bonus-btn .price {
-            color: #f0b90b;
-            font-weight: 700;
-            margin-top: 4px;
-        }
-        
-        /* Auto Spin Controls */
-        .gemslot-auto-controls {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        
-        .gemslot-auto-input {
-            flex: 1;
-            background: #2a2734;
-            border: 1px solid #5f4b8b;
-            border-radius: 12px;
-            padding: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            outline: none;
-            text-align: center;
-        }
-        
-        .gemslot-auto-btn {
-            background: #7c5fcf;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 20px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .gemslot-auto-btn:hover:not(:disabled) {
-            background: #9f7aea;
-        }
-        
-        .gemslot-auto-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .gemslot-auto-btn.stop {
-            background: #f25a5a;
-        }
-        
-        .gemslot-auto-btn.stop:hover {
-            background: #ff6b6b;
-        }
-        
-        /* Mode Selector */
-        .gemslot-mode-selector {
-            display: flex;
-            gap: 8px;
-            background: #2a2734;
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 16px;
-        }
-        
-        .gemslot-mode-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            color: #7a7499;
-            font-weight: 500;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .gemslot-mode-btn.active {
-            background: #7c5fcf;
-            color: white;
-        }
-        
-        .gemslot-spin-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #7c5fcf, #9f7aea);
-            border: none;
-            border-radius: 40px;
-            padding: 16px;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #4a3f6e;
-            margin-bottom: 16px;
-            transition: all 0.2s;
-        }
-        
-        .gemslot-spin-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 0 #4a3f6e;
-        }
-        
-        .gemslot-spin-btn:active:not(:disabled) {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #4a3f6e;
-        }
-        
-        .gemslot-spin-btn:disabled {
-            opacity: 0.5;
-        }
-        
-        .gemslot-result {
-            background: #1e1b2a;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            border: 1px solid #5f4b8b;
-            margin-bottom: 16px;
-        }
-        
-        .gemslot-result-text {
-            color: #c7b3ff;
-            font-size: 15px;
-        }
-        
-        .gemslot-result-highlight {
-            font-weight: 700;
-            font-size: 18px;
-        }
-        
-        .gemslot-result-highlight.win { color: #2fb77e; }
-        .gemslot-result-highlight.lose { color: #f25a5a; }
-        
-        /* Big Win Animation */
-        .big-win-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            animation: fadeIn 0.3s;
-        }
-        
-        .big-win-content {
-            text-align: center;
-            animation: pulse 0.5s ease infinite;
-        }
-        
-        .big-win-title {
-            font-size: 48px;
-            font-weight: 800;
-            margin-bottom: 20px;
-        }
-        
-        .big-win-title.big { color: #2fb77e; text-shadow: 0 0 30px #2fb77e; }
-        .big-win-title.mega { color: #f0b90b; text-shadow: 0 0 30px #f0b90b; }
-        .big-win-title.sensational { color: #ff6b6b; text-shadow: 0 0 30px #ff6b6b; }
-        
-        .big-win-amount {
-            color: white;
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 30px;
-        }
-        
-        .big-win-multiplier {
-            color: #7c5fcf;
-            font-size: 24px;
-            font-weight: 600;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        .gemslot-info {
-            background: #1e1b2a;
-            border-radius: 12px;
-            padding: 16px;
-            border: 1px solid #5f4b8b;
-        }
-        
-        .gemslot-info-title {
-            color: white;
-            font-weight: 600;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .gemslot-info-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        
-        .gemslot-info-card {
-            background: #2a2734;
-            border-radius: 8px;
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #5f4b8b;
-        }
-        
-        .gemslot-info-card img {
-            width: 28px;
-            height: 28px;
-            object-fit: contain;
-            margin-bottom: 2px;
-        }
-        
-        .gemslot-info-card .desc {
-            color: #7a7499;
-            font-size: 10px;
-        }
-        
-        .gemslot-info-card .value {
-            color: #f0b90b;
-            font-weight: 700;
-            font-size: 11px;
-        }
-        
-        .gemslot-info-text {
-            color: #c7b3ff;
-            font-size: 12px;
-            line-height: 1.5;
-            padding-top: 8px;
-            border-top: 1px dashed #5f4b8b;
+
+        .screenshot-guide {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            animation: pulse-border 2s infinite;
         }
 
-        /* ===== OTHER GAME PAGES ===== */
-        .game-header { display: flex; justify-content: space-between; align-items: center; margin: 16px 0; }
-        .game-time { color: #7a7499; font-size: 14px; }
-        .limbo-container, .roulette-container, .mines-grid, .tower-game-container { background: #1e1b2a; border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid #2a2734; }
-        .history-section { margin-top: 20px; }
-        .history-grid { display: flex; gap: 8px; flex-wrap: wrap; }
-        .history-item { width: 48px; height: 48px; background: #2a2734; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; }
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+        }
 
-        .bottom-nav {
-            position: fixed; bottom: 0; max-width: 375px; width: 100%; background: #13111c;
-            display: flex; justify-content: space-around; align-items: center;
-            padding: 12px 0 18px; border-top: 1px solid #2a2734;
+        .anti-cheat-warning {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            animation: flash 1s infinite;
         }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            color: #7a7499; font-size: 12px; cursor: pointer;
-        }
-        .nav-item.active { color: #c7b3ff; }
-        .nav-item i { font-size: 24px; }
         
-        /* Notification */
-        .notification {
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .countdown-timer {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .modal-overlay {
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .wa-btn {
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+        }
+
+        .claim-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .ss-required {
+            border: 3px solid #ef4444;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { border-color: #ef4444; }
+            50% { border-color: #fbbf24; }
+        }
+
+        /* Confetti */
+        .confetti {
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e1b2a;
-            border: 2px solid;
-            border-radius: 40px;
-            padding: 12px 24px;
-            color: white;
-            font-weight: 600;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideDown 0.3s;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
         }
         
-        .notification.win { border-color: #2fb77e; }
-        .notification.lose { border-color: #f25a5a; }
-        .notification.bonus { border-color: #7c5fcf; }
-        
-        @keyframes slideDown {
-            from { transform: translate(-50%, -100px); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .security-pattern {
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.03) 10px,
+                rgba(255,255,255,0.03) 20px
+            );
         }
     </style>
 </head>
-<body>
-    <div class="phone-frame">
-        <!-- ===== HEADER ===== -->
-        <div class="top-header">
-            <img class="logo-image" src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/5f3864a7-c0de-4438-b8d0-2c2f5b8d45ad.png" alt="GrowGem" id="logoDoubleClick">
-            
-            <div class="balance-card" id="balanceCard">
-                <img class="balance-icon" src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/7e7c0349-9d99-464e-8544-ab82a841a385.png" alt="DL">
-                <span class="balance-amount" id="balanceAmount">100.00</span>
-            </div>
-            
-            <div id="authContainer" class="auth-buttons">
-                <button class="btn-login" onclick="showModal('login')">Login</button>
-                <button class="btn-register" onclick="showModal('register')">Registrasi</button>
-            </div>
-            <div id="userProfile" class="user-avatar" style="display: none;" onclick="openProfile()">
-                <img id="userAvatarImg" src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/c7993bbc-82a1-4792-8381-88d10da00977.jpg" alt="Avatar">
-            </div>
-        </div>
+<body class="text-white overflow-x-hidden security-pattern">
 
-        <!-- ===== HOME PAGE ===== -->
-        <div id="homePage" class="home-page">
-            <div class="slider-section">
-                <div class="slider-container">
-                    <div class="banner-card">
-                        <img src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/f887524a-d6de-41de-95db-347a099e12e6.jpg" alt="Banner">
-                    </div>
-                    <div class="banner-card">
-                        <img src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/0ac3544d-e47f-4542-a3c6-51c9b202a780.png" alt="Banner 2">
-                    </div>
-                </div>
-            </div>
+    <!-- Anti-Cheat Overlay -->
+    <div id="antiCheatOverlay" class="fixed inset-0 bg-red-600/95 z-[9999] hidden flex-col items-center justify-center text-center p-6">
+        <div class="text-6xl mb-4">🚫</div>
+        <h2 class="text-2xl font-bold mb-2">AUTO CLICKER TERDETEKSI!</h2>
+        <p class="text-lg mb-4">Akun Anda telah dikunci.</p>
+        <p class="text-sm opacity-80">Hubungi admin: 0813-9674-1367</p>
+        <button onclick="location.reload()" class="bg-white text-red-600 px-6 py-3 rounded-full font-bold mt-4">
+            Keluar
+        </button>
+    </div>
 
-            <div class="original-section">
-                <div class="original-header">
-                    <div class="header-left"><h3>Original</h3></div>
-                </div>
-                <div class="game-grid-scroll">
-                    <div class="game-grid">
-                        <div class="game-card" onclick="openReme()">
-                            <img class="game-card-img" src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/ac1f727f-7737-4ff4-9f39-e0f7812d352b.png" alt="Reme">
-                        </div>
-                        <div class="game-card" onclick="openMines()">
-                            <img class="game-card-img" src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/6189f055-f5f8-48a4-9bd1-b095e0eb5d28.jpg" alt="Mines">
-                        </div>
-                        <div class="game-card" onclick="openTowers()">
-                            <img class="game-card-img" src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/f928b25a-a80c-4039-a4ab-3c100e851b7e.jpg" alt="Towers">
-                        </div>
-                        <div class="game-card" onclick="openLimbo()">
-                            <img class="game-card-img" src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/fb83d517-1ca3-485c-8f74-d592e5820d78.png" alt="Limbo">
-                        </div>
-                        <div class="game-card">
-                            <img class="game-card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150' viewBox='0 0 100 150'%3E%3Crect width='100' height='150' fill='%2330274e'/%3E%3Ctext x='50' y='80' font-size='22' text-anchor='middle' fill='%23c7b3ff'%3ENEW%3C/text%3E%3C/svg%3E" alt="New">
-                        </div>
-                        <div class="game-card">
-                            <img class="game-card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150' viewBox='0 0 100 150'%3E%3Crect width='100' height='150' fill='%2330274e'/%3E%3Ctext x='50' y='80' font-size='22' text-anchor='middle' fill='%23c7b3ff'%3EHILO%3C/text%3E%3C/svg%3E" alt="Hilo">
-                        </div>
-                        <div class="game-card">
-                            <img class="game-card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150' viewBox='0 0 100 150'%3E%3Crect width='100' height='150' fill='%2330274e'/%3E%3Ctext x='50' y='85' font-size='40' text-anchor='middle' fill='%23c7b3ff'%3EA%3C/text%3E%3C/svg%3E" alt="A">
-                        </div>
-                    </div>
-                </div>
+    <!-- Screenshot Modal -->
+    <div id="ssModal" class="fixed inset-0 modal-overlay z-[9998] hidden items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl p-6 max-w-sm w-full text-center">
+            <div class="text-5xl mb-4">📸</div>
+            <h2 class="text-xl font-bold mb-2">Screenshot Kupon!</h2>
+            <p class="text-purple-200 mb-4 text-sm">Anda harus screenshot kupon ini untuk claim. Kupon hanya valid dengan bukti screenshot.</p>
+            <div class="bg-yellow-500/20 border-2 border-yellow-400 rounded-xl p-3 mb-4">
+                <i class="fas fa-exclamation-triangle text-yellow-400 mr-2"></i>
+                <span class="text-sm font-bold">Jangan lupa screenshot sebelum menutup!</span>
             </div>
-
-            <!-- ===== POPULAR SLOTS - GEM SLOT PAKE POSTER ===== -->
-            <div class="popular-section">
-                <div class="section-header">
-                    <h2>Slot Populer</h2>
-                </div>
-                <div class="slot-row">
-                    <!-- GEM SLOT CARD - PAKE POSTER -->
-                    <div class="slot-card" onclick="openGemSlot()">
-                        <img class="slot-card-img" src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/759d9382-7e09-49f2-8610-10c2d338e206.jpg" alt="Gem Slot">
-                    </div>
-                    <div class="slot-card">
-                        <img class="slot-card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150' viewBox='0 0 100 150'%3E%3Crect width='100' height='150' fill='%2330274e'/%3E%3Ctext x='50' y='80' font-size='22' text-anchor='middle' fill='%23c7b3ff'%3ETRAMP%3C/text%3E%3C/svg%3E" alt="Tramp Day">
-                    </div>
-                    <div class="slot-card">
-                        <img class="slot-card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150' viewBox='0 0 100 150'%3E%3Crect width='100' height='150' fill='%2330274e'/%3E%3Ctext x='50' y='80' font-size='22' text-anchor='middle' fill='%23c7b3ff'%3EBLACK%3C/text%3E%3C/svg%3E" alt="Blackjack">
-                    </div>
-                    <div class="slot-card">
-                        <img class="slot-card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150' viewBox='0 0 100 150'%3E%3Crect width='100' height='150' fill='%2330274e'/%3E%3Ctext x='50' y='80' font-size='22' text-anchor='middle' fill='%23c7b3ff'%3EMERGE%3C/text%3E%3C/svg%3E" alt="Merge Up">
-                    </div>
-                    <div class="slot-card">
-                        <img class="slot-card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150' viewBox='0 0 100 150'%3E%3Crect width='100' height='150' fill='%2330274e'/%3E%3Ctext x='50' y='80' font-size='22' text-anchor='middle' fill='%23c7b3ff'%3ELIMBO%3C/text%3E%3C/svg%3E" alt="Limbo">
-                    </div>
-                    <div class="slot-card">
-                        <img class="slot-card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150' viewBox='0 0 100 150'%3E%3Crect width='100' height='150' fill='%2330274e'/%3E%3Ctext x='50' y='80' font-size='22' text-anchor='middle' fill='%23c7b3ff'%3ECOIN%3C/text%3E%3C/svg%3E" alt="Coin Flip">
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===== LIVE BETS SECTION ===== -->
-            <div class="live-bets-section">
-                <div class="live-bets-header">
-                    <i class="fas fa-fire"></i>
-                    <span>LIVE BETS</span>
-                </div>
-                <div class="live-bets-container" id="liveBetsContainer"></div>
-            </div>
-        </div>
-
-        <!-- ===== GEM SLOT PAGE ===== -->
-        <div id="gemSlotPage" class="gemslot-page">
-            <div class="gemslot-header">
-                <img src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/759d9382-7e09-49f2-8610-10c2d338e206.jpg" alt="Gem Slot">
-                <h2>GEM SLOT</h2>
-            </div>
-            
-            <div class="gemslot-machine">
-                <div class="gemslot-window">
-                    <div class="gemslot-grid" id="gemSlotGrid">
-                        <!-- Rows will be generated by JS -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="gemslot-payout">
-                <span class="gemslot-payout-label">Total Pembayaran</span>
-                <span class="gemslot-payout-value" id="gemSlotPayout">0.00 <i class="fas fa-rocket" style="color:#7c5fcf; font-size:14px;"></i></span>
-            </div>
-            
-            <!-- Bonus Info Panel -->
-            <div class="gemslot-bonus-info" id="gemSlotBonusInfo" style="display: none;">
-                <div class="gemslot-bonus-info-item">
-                    <i class="fas fa-star"></i>
-                    <span class="gemslot-bonus-info-text">Bonus Mode: <span id="gemSlotBonusTurns">0</span></span>
-                </div>
-                <div class="gemslot-bonus-info-item">
-                    <i class="fas fa-gem"></i>
-                    <span class="gemslot-bonus-info-text">Diamond: <span id="gemSlotDiamondCount">0</span></span>
-                </div>
-            </div>
-            
-            <div class="gemslot-control">
-                <div class="gemslot-bet">
-                    <span class="gemslot-bet-label">Jumlah Taruhan (DL)</span>
-                    <input type="number" class="gemslot-bet-input" id="gemSlotBet" value="1.00" min="0.1" step="0.1" onchange="updateGemSlotPrices()">
-                </div>
-                
-                <div class="gemslot-bonus-section">
-                    <div class="gemslot-bonus-title">
-                        <i class="fas fa-gift"></i>
-                        <span>BELI BONUS SPIN</span>
-                    </div>
-                    <div class="gemslot-bonus-grid">
-                        <button class="gemslot-bonus-btn" onclick="buyGemSlotBonus(1)" id="gemSlotBonus1">
-                            <div>1x Bonus</div>
-                            <div class="price" id="gemSlotPrice1">5.00 DL</div>
-                            <div style="font-size:10px;">(1 spin)</div>
-                        </button>
-                        <button class="gemslot-bonus-btn" onclick="buyGemSlotBonus(10)" id="gemSlotBonus10">
-                            <div>10x Bonus</div>
-                            <div class="price" id="gemSlotPrice10">45.00 DL</div>
-                            <div style="font-size:10px;">(10 spin)</div>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Auto Spin Controls -->
-                <div class="gemslot-auto-controls">
-                    <input type="number" class="gemslot-auto-input" id="gemSlotAutoCount" value="5" min="1" max="100" step="1">
-                    <button class="gemslot-auto-btn" id="gemSlotAutoStartBtn" onclick="startAutoSpin()">Auto</button>
-                    <button class="gemslot-auto-btn stop" id="gemSlotAutoStopBtn" onclick="stopAutoSpin()" disabled>Stop</button>
-                </div>
-                
-                <!-- Mode Selector -->
-                <div class="gemslot-mode-selector">
-                    <button class="gemslot-mode-btn active" onclick="setGemSlotMode('manual')" id="gemSlotModeManual">Manual</button>
-                    <button class="gemslot-mode-btn" onclick="setGemSlotMode('auto')" id="gemSlotModeAuto">Otomatis</button>
-                </div>
-            </div>
-            
-            <button class="gemslot-spin-btn" id="gemSlotSpinBtn" onclick="spinGemSlot()">SPIN</button>
-            
-            <div class="gemslot-result" id="gemSlotResult">
-                <div class="gemslot-result-text" id="gemSlotResultText">Tekan SPIN untuk bermain</div>
-            </div>
-            
-            <div class="gemslot-info">
-                <div class="gemslot-info-title">
-                    <i class="fas fa-info-circle" style="color:#7c5fcf;"></i>
-                    <span>CARA MAIN & MULTIPLIER</span>
-                </div>
-                
-                <div class="gemslot-info-grid">
-                    <div class="gemslot-info-card">
-                        <img src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/294c2ca7-2430-48a1-b0e4-ccd6c6a13ace.png">
-                        <div class="desc">3-7</div>
-                        <div class="value">+0.5 - +1.5x</div>
-                    </div>
-                    <div class="gemslot-info-card">
-                        <img src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/e4aa4964-c315-4414-9b7e-fe0fcfdc3107.png">
-                        <div class="desc">4-8</div>
-                        <div class="value">+0.5 - +2.5x</div>
-                    </div>
-                    <div class="gemslot-info-card">
-                        <img src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/7e7c0349-9d99-464e-8544-ab82a841a385.png">
-                        <div class="desc">3-7</div>
-                        <div class="value">+1.0 - +5.0x</div>
-                    </div>
-                    <div class="gemslot-info-card">
-                        <img src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/6cd32901-9a1b-48c6-896c-fc9e193f1295.png">
-                        <div class="desc">Per</div>
-                        <div class="value">+0.05x</div>
-                    </div>
-                    <div class="gemslot-info-card">
-                        <img src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/ba4c29cd-0ebd-414a-a0f5-dc9c0a70b332.png">
-                        <div class="desc">1-4</div>
-                        <div class="value">-0.20x</div>
-                    </div>
-                    <div class="gemslot-info-card">
-                        <img src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/8ed5bfe1-cbb7-4ac4-ba80-a841b7dfe932.png">
-                        <div class="desc">3</div>
-                        <div class="value">+5 Bonus</div>
-                    </div>
-                </div>
-                
-                <div class="gemslot-info-text">
-                    <strong>Contoh:</strong> 4💎(+0.75) + 4🔑(+0.5) + 2💀(+0.1) - 2💣(-0.4) = <strong>1.95x</strong><br>
-                    <strong>BIG WIN (3x)</strong> · <strong>MEGA WIN (5x)</strong> · <strong>SENSATIONAL (10x)</strong>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== OTHER GAME PAGES ===== -->
-        <div id="remePage" class="reme-page"><div class="game-header"><div class="game-time" id="remeTime">12:00</div></div><div class="roulette-container"><h3 style="color:white;">Reme Game</h3></div></div>
-        <div id="minesPage" class="mines-page"><div class="game-header"><div class="game-time" id="minesTime">12:00</div></div><div class="mines-grid"></div></div>
-        <div id="towersPage" class="towers-page"><div class="game-header"><div class="game-time" id="towersTime">12:00</div></div><div class="tower-game-container"></div></div>
-        <div id="limboPage" class="limbo-page"><div class="game-header"><div class="game-time" id="limboTime">12:00</div></div><div class="limbo-container"></div></div>
-        <div id="bonusPage" class="bonus-page"><h3 style="color:white;">Bonus Page</h3></div>
-        <div id="chatPage" class="chat-page"><h3 style="color:white;">Chat Page</h3></div>
-        <div id="profilePage" class="profile-page"><h3 style="color:white;">Profile Page</h3></div>
-        
-        <!-- ===== WALLET PAGE ===== -->
-        <div id="walletPage" class="wallet-page">
-            <div class="wallet-header">
-                <h2>Dompet</h2>
-                <button class="promo-header-btn" onclick="openPromoModal()">
-                    <i class="fas fa-ticket-alt"></i>
-                    <span>Kode Promo</span>
-                </button>
-            </div>
-            <div class="wallet-balance">
-                <div class="wallet-balance-label">Saldo Tersedia</div>
-                <div class="wallet-balance-amount">
-                    <img src="https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/7e7c0349-9d99-464e-8544-ab82a841a385.png" alt="DL">
-                    <span id="walletBalanceAmount">100.00</span>
-                </div>
-            </div>
-            <div class="wallet-grid">
-                <div class="wallet-card" onclick="alert('Deposit (next update)')">
-                    <i class="fas fa-arrow-down"></i>
-                    <div class="wallet-card-title">Deposit</div>
-                    <div class="wallet-card-desc">Tambah saldo</div>
-                </div>
-                <div class="wallet-card" onclick="alert('Withdraw (next update)')">
-                    <i class="fas fa-arrow-up"></i>
-                    <div class="wallet-card-title">Withdraw</div>
-                    <div class="wallet-card-desc">Tarik saldo</div>
-                </div>
-                <div class="wallet-card" onclick="alert('Transfer (next update)')">
-                    <i class="fas fa-exchange-alt"></i>
-                    <div class="wallet-card-title">Transfer</div>
-                    <div class="wallet-card-desc">Kirim ke user</div>
-                </div>
-                <div class="wallet-card" onclick="alert('Riwayat Transaksi')">
-                    <i class="fas fa-history"></i>
-                    <div class="wallet-card-title">Riwayat</div>
-                    <div class="wallet-card-desc">Transaksi</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== BOTTOM NAV ===== -->
-        <div class="bottom-nav">
-            <div class="nav-item" onclick="openBonus()"><i class="fas fa-gift"></i><span>Bonus</span></div>
-            <div class="nav-item" onclick="showHome()"><i class="fas fa-home"></i><span>Beranda</span></div>
-            <div class="nav-item active" onclick="openWallet()"><i class="fas fa-wallet"></i><span>Dompet</span></div>
-            <div class="nav-item" onclick="openChat()"><i class="fas fa-comment"></i><span>Obrolan</span></div>
+            <button onclick="closeSsModal()" class="bg-green-500 hover:bg-green-600 w-full py-3 rounded-xl font-bold">
+                Sudah Screenshot ✓
+            </button>
         </div>
     </div>
 
-    <!-- ===== PROMO MODAL ===== -->
-    <div id="promoModal" class="promo-modal">
-        <div class="promo-content">
-            <div class="promo-close" onclick="closePromoModal()">×</div>
-            <h2>KODE PROMO</h2>
-            <div class="promo-input-group">
-                <input type="text" class="promo-input" id="promoCodeInput" placeholder="MASUKKAN KODE" maxlength="20">
-                <button class="promo-submit" onclick="redeemPromoCode()"><i class="fas fa-plus"></i></button>
-            </div>
-            <div class="promo-info-box">
-                <p><i class="fas fa-info-circle"></i> Kode promo bersifat rahasia</p>
-                <p><i class="fas fa-tag"></i> Setiap kode hanya bisa dipakai 1x per akun</p>
-                <p><i class="fas fa-level-up-alt"></i> Beberapa kode memiliki persyaratan level</p>
+    <!-- Hourly Check Modal -->
+    <div id="hourlyModal" class="fixed inset-0 modal-overlay z-[9997] hidden items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl p-8 max-w-sm w-full text-center">
+            <div class="text-5xl mb-4">⏰</div>
+            <h2 class="text-2xl font-bold mb-2">Sudah 1 Jam!</h2>
+            <p class="text-purple-200 mb-6">Lanjutkan mining?</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="continuePlaying(true)" class="bg-green-500 hover:bg-green-600 py-3 rounded-xl font-bold">
+                    ✅ Lanjut
+                </button>
+                <button onclick="continuePlaying(false)" class="bg-red-500 hover:bg-red-600 py-3 rounded-xl font-bold">
+                    ❌ Keluar
+                </button>
             </div>
         </div>
+    </div>
+
+    <!-- Floating Elements -->
+    <div id="floatingCoins"></div>
+
+    <!-- Main Container -->
+    <div class="max-w-md mx-auto min-h-screen flex flex-col p-4 pb-24">
+        
+        <!-- Header -->
+        <div class="glass-panel rounded-2xl p-4 mb-4">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-2xl shadow-lg">
+                        🪙
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg">ClickCoin</h1>
+                        <p class="text-xs text-purple-200">100 Coin = Rp 1 (Auto)</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs text-purple-200">Sesi</div>
+                    <div id="sessionTimer" class="countdown-timer text-sm font-bold">00:00:00</div>
+                </div>
+            </div>
+            
+            <!-- Anti-Cheat Status -->
+            <div id="antiCheatStatus" class="bg-green-500/20 border border-green-500/40 rounded-lg p-2 flex items-center gap-2 text-xs">
+                <i class="fas fa-shield-alt text-green-400"></i>
+                <span class="text-green-300">Protected</span>
+                <span id="clickSpeed" class="ml-auto font-mono">0 CPS</span>
+            </div>
+        </div>
+
+        <!-- Balance Display -->
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="glass-panel rounded-2xl p-4 text-center relative overflow-hidden">
+                <div class="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                <div class="text-2xl mb-1">🪙</div>
+                <div class="text-xs text-purple-200 mb-1">Coin</div>
+                <div id="coinDisplay" class="text-2xl font-bold text-yellow-300">0</div>
+                <div class="text-xs text-yellow-200 mt-1"><span id="autoConvertProgress">0</span>/100</div>
+            </div>
+            <div class="glass-panel rounded-2xl p-4 text-center relative overflow-hidden">
+                <div class="absolute top-2 right-2 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <div class="text-2xl mb-1">💵</div>
+                <div class="text-xs text-purple-200 mb-1">Rupiah</div>
+                <div id="rupiahDisplay" class="text-2xl font-bold text-green-400">Rp 0</div>
+                <div class="text-xs text-green-200 mt-1" id="todayWithdraw">Hari ini: Rp 0</div>
+            </div>
+        </div>
+
+        <!-- Daily Limit Progress -->
+        <div class="glass-panel rounded-xl p-3 mb-4">
+            <div class="flex justify-between text-sm mb-2">
+                <span class="text-purple-200">Limit Harian (Rp 5K - 20K)</span>
+                <span id="limitText" class="font-bold">Rp 0 / 20.000</span>
+            </div>
+            <div class="w-full bg-black/30 rounded-full h-3">
+                <div id="limitBar" class="bg-gradient-to-r from-green-500 to-yellow-500 h-3 rounded-full transition-all" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Simple Stats -->
+        <div class="glass-panel rounded-xl p-3 mb-4 flex justify-around text-center text-sm">
+            <div>
+                <div class="text-purple-200 text-xs">Per Klik</div>
+                <div class="font-bold text-yellow-300">+1</div>
+            </div>
+            <div>
+                <div class="text-purple-200 text-xs">Total Klik</div>
+                <div id="totalClicksDisplay" class="font-bold">0</div>
+            </div>
+            <div>
+                <div class="text-purple-200 text-xs">Kupon</div>
+                <div id="kuponCount" class="font-bold text-pink-300">0</div>
+            </div>
+        </div>
+
+        <!-- Main Click Area -->
+        <div class="flex-1 flex items-center justify-center mb-4 relative">
+            <button id="mainCoinBtn" onclick="handleClick(event)" 
+                class="coin-btn w-56 h-56 rounded-full flex flex-col items-center justify-center relative z-10">
+                <div class="text-7xl mb-2 filter drop-shadow-lg">🪙</div>
+                <div class="text-purple-900 font-bold text-xl">CLICK!</div>
+                <div class="text-purple-800 text-sm mt-1 font-semibold">+1 Coin</div>
+            </button>
+        </div>
+
+        <!-- Speed Warning -->
+        <div id="speedWarning" class="hidden bg-red-500/80 text-white text-center py-2 rounded-xl mb-4 text-sm font-bold">
+            ⚠️ Terlalu cepat! Slow down!
+        </div>
+
+        <!-- My Kupon Section -->
+        <div class="glass-panel rounded-2xl p-4 mb-4">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-bold flex items-center gap-2">
+                    <i class="fas fa-ticket-alt text-pink-400"></i>
+                    Kupon Saya
+                </h3>
+                <span class="text-xs bg-pink-500/30 px-2 py-1 rounded-full">
+                    Total: <span id="totalKupon">0</span>
+                </span>
+            </div>
+            
+            <!-- Screenshot Guide -->
+            <div class="screenshot-guide rounded-xl p-3 mb-3 text-center">
+                <i class="fas fa-camera text-white text-xl mb-1"></i>
+                <p class="text-xs font-bold text-white">WAJIB SCREENSHOT KUPON UNTUK CLAIM!</p>
+                <p class="text-xs text-white/80">Kirim ke WA: 0813-9674-1367</p>
+            </div>
+
+            <div id="kuponList" class="space-y-3 max-h-64 overflow-y-auto">
+                <p class="text-center text-purple-300 text-sm py-4">Belum ada kupon</p>
+            </div>
+        </div>
+
+        <!-- Create Kupon Section -->
+        <div class="glass-panel rounded-2xl p-4 mb-4">
+            <h3 class="font-bold mb-3 flex items-center gap-2">
+                <i class="fas fa-plus-circle text-green-400"></i>
+                Buat Kupon Penarikan
+            </h3>
+            
+            <div class="bg-black/20 rounded-xl p-3 mb-3 text-sm">
+                <div class="flex justify-between mb-1">
+                    <span class="text-purple-200">Min:</span>
+                    <span class="font-bold text-green-400">Rp 5.000</span>
+                </div>
+                <div class="flex justify-between mb-1">
+                    <span class="text-purple-200">Max/hari:</span>
+                    <span class="font-bold text-yellow-400">Rp 20.000</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold border-t border-white/20 pt-2 mt-2">
+                    <span>Saldo:</span>
+                    <span id="createSaldo" class="text-green-400">Rp 0</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mb-3">
+                <button onclick="createKupon(5000)" class="bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold text-sm transition">
+                    Rp 5K
+                </button>
+                <button onclick="createKupon(10000)" class="bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold text-sm transition">
+                    Rp 10K
+                </button>
+                <button onclick="createKupon(20000)" class="bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-bold text-sm transition">
+                    Rp 20K
+                </button>
+            </div>
+            
+            <button onclick="createKuponCustom()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 py-3 rounded-xl font-bold text-sm transition">
+                <i class="fas fa-sliders-h mr-2"></i>
+                Nominal Custom (5K - 20K)
+            </button>
+        </div>
+
+        <!-- WA Claim Section -->
+        <div class="glass-panel rounded-xl p-4 mb-20">
+            <div class="text-center mb-3">
+                <p class="text-sm text-purple-200 mb-2">Claim kupon via WhatsApp</p>
+                <div class="text-xs bg-red-500/20 border border-red-500/40 rounded-lg p-2 mb-3">
+                    <i class="fas fa-exclamation-circle text-red-400 mr-1"></i>
+                    <span class="text-red-300">Wajib lampirkan screenshot kupon!</span>
+                </div>
+            </div>
+            
+            <a href="https://wa.me/6281396741367?text=Halo%20admin%20ClickCoin,%20saya%20mau%20claim%20kupon%20[screenshot]" 
+               target="_blank" 
+               class="wa-btn w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-bold text-white hover:scale-105 transition">
+                <i class="fab fa-whatsapp text-2xl"></i>
+                <div class="text-left">
+                    <div class="text-sm">Hubungi Admin</div>
+                    <div class="text-lg">0813-9674-1367</div>
+                </div>
+            </a>
+            
+            <div class="mt-3 text-center">
+                <p class="text-xs text-purple-300">Format claim:</p>
+                <p class="text-xs bg-black/30 rounded-lg p-2 mt-1 font-mono">
+                    "Halo admin, claim kupon [nomor seri]"<br>
+                    + screenshot kupon
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Kupon Modal -->
+    <div id="customKuponModal" class="fixed inset-0 modal-overlay z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel rounded-2xl p-6 max-w-sm w-full">
+            <h3 class="text-xl font-bold mb-4 text-center">Buat Kupon</h3>
+            <input type="number" id="customKuponAmount" placeholder="5000 - 20000" 
+                class="w-full bg-black/30 border border-purple-500/30 rounded-xl px-4 py-3 text-white mb-4 outline-none focus:border-purple-500 text-center font-bold text-lg">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeCustomModal()" class="bg-gray-600 py-3 rounded-xl font-bold">Batal</button>
+                <button onclick="confirmCustomKupon()" class="bg-green-500 hover:bg-green-600 py-3 rounded-xl font-bold">Buat Kupon</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white text-gray-900 px-6 py-3 rounded-full shadow-2xl hidden items-center gap-2 z-50 font-bold">
+        <span id="notifIcon">✅</span>
+        <span id="notifText">Notifikasi</span>
     </div>
 
     <script>
-        // ===== FIREBASE CONFIG =====
-        const firebaseConfig = {
-            apiKey: "AIzaSyAoYgDdB9CwYBcI2rvd1SCF-kN4Llt96f4",
-            authDomain: "growbet-952ac.firebaseapp.com",
-            databaseURL: "https://growbet-952ac-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "growbet-952ac",
-            storageBucket: "growbet-952ac.firebasestorage.app",
-            messagingSenderId: "456583017296",
-            appId: "1:456583017296:web:ff1c4ffc28616cd9c33255",
-            measurementId: "G-MEQ1FNXLWW"
+        // Game State - Simplified (no upgrades)
+        let gameState = {
+            coins: 0,
+            rupiah: 0,
+            totalClicks: 0,
+            kuponList: [],
+            todayWithdraw: 0,
+            lastWithdrawDate: new Date().toDateString(),
+            lastHourlyCheck: Date.now(),
+            isLocked: false,
+            totalKuponCreated: 0,
+            sessionStart: Date.now()
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        // Anti-Cheat Variables
+        let clickTimes = [];
+        let lastClickTime = 0;
+        let cpsWarningCount = 0;
+        const MAX_CPS = 12; // Strict limit
+        const WARNING_THRESHOLD = 2; // Lock after 2 warnings
 
-        // ===== GLOBAL STATE =====
-        let loggedInUser = localStorage.getItem('growgem_loggedin');
-        let users = JSON.parse(localStorage.getItem('growgem_users')) || {};
-        let userBalance = 100.00;
-        
-        if (loggedInUser && users[loggedInUser]) {
-            userBalance = users[loggedInUser].balance || 100.00;
-        }
-
-        // ===== GEM SLOT STATE =====
-        let gemSlotGameActive = false;
-        let gemSlotFreeSpins = 0;
-        let gemSlotBonusTurns = 0;
-        let gemSlotDiamondCount = 0;
-        let gemSlotMode = 'manual';
-        let gemSlotAutoActive = false;
-        let gemSlotAutoCount = 0;
-        let gemSlotAutoInterval = null;
-        
-        // ===== SOUND EFFECTS =====
-        const sounds = {
-            spin: new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3'),
-            win: new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3'),
-            lose: new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3'),
-            bonus: new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3'),
-            bigWin: new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3')
-        };
-        
-        // Preload sounds
-        Object.values(sounds).forEach(sound => {
-            sound.load();
-            sound.volume = 0.3;
-        });
-        
-        const GEM_ICONS = {
-            gem: 'https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/294c2ca7-2430-48a1-b0e4-ccd6c6a13ace.png',
-            key: 'https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/e4aa4964-c315-4414-9b7e-fe0fcfdc3107.png',
-            bomb: 'https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/ba4c29cd-0ebd-414a-a0f5-dc9c0a70b332.png',
-            skull: 'https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/6cd32901-9a1b-48c6-896c-fc9e193f1295.png',
-            diamond: 'https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/7e7c0349-9d99-464e-8544-ab82a841a385.png',
-            bonus: 'https://i.supaimg.com/b10b275e-9e81-414c-86fb-daec7edd5863/8ed5bfe1-cbb7-4ac4-ba80-a841b7dfe932.png'
-        };
-        
-        const GEM_ITEMS = [
-            { type: 'bomb', prob: 30, icon: GEM_ICONS.bomb },
-            { type: 'skull', prob: 10, icon: GEM_ICONS.skull },
-            { type: 'gem', prob: 20, icon: GEM_ICONS.gem },
-            { type: 'key', prob: 20, icon: GEM_ICONS.key },
-            { type: 'diamond', prob: 15, icon: GEM_ICONS.diamond },
-            { type: 'bonus', prob: 5, icon: GEM_ICONS.bonus }
-        ];
-        
-        // Initialize Gem Slot grid
-        function initGemSlot() {
-            const grid = document.getElementById('gemSlotGrid');
-            if (!grid) return;
-            
-            grid.innerHTML = '';
-            
-            for (let row = 0; row < 3; row++) {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'gemslot-row';
-                
-                for (let col = 0; col < 5; col++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'gemslot-cell';
-                    
-                    const reel = document.createElement('div');
-                    reel.className = 'gemslot-reel';
-                    reel.id = `gemReel-${row}-${col}`;
-                    
-                    // Add 8 items to each reel
-                    for (let i = 0; i < 8; i++) {
-                        const item = document.createElement('div');
-                        item.className = 'gemslot-reel-item';
-                        const img = document.createElement('img');
-                        const randomItem = getGemRandomItem();
-                        img.src = randomItem.icon;
-                        img.alt = randomItem.type;
-                        item.appendChild(img);
-                        reel.appendChild(item);
-                    }
-                    
-                    const overlay = document.createElement('div');
-                    overlay.className = 'gemslot-overlay';
-                    
-                    cell.appendChild(reel);
-                    cell.appendChild(overlay);
-                    rowDiv.appendChild(cell);
+        // Load Game
+        function loadGame() {
+            const saved = localStorage.getItem('clickCoinSimple');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                const today = new Date().toDateString();
+                if (parsed.lastWithdrawDate !== today) {
+                    parsed.todayWithdraw = 0;
+                    parsed.lastWithdrawDate = today;
                 }
+                gameState = { ...gameState, ...parsed };
                 
-                grid.appendChild(rowDiv);
+                if (gameState.isLocked) {
+                    showAntiCheatLock();
+                    return;
+                }
             }
-            
-            // Set initial positions
-            gsap.set('[id^="gemReel-"]', { y: 0 });
+            updateDisplay();
+            startAutoConvert();
+            startHourlyCheck();
+            startSessionTimer();
         }
-        
-        function getGemRandomItem() {
-            const rand = Math.random() * 100;
-            let cumulative = 0;
-            for (let item of GEM_ITEMS) {
-                cumulative += item.prob;
-                if (rand < cumulative) return { ...item };
-            }
-            return { ...GEM_ITEMS[0] };
+
+        // Save Game
+        function saveGame() {
+            localStorage.setItem('clickCoinSimple', JSON.stringify(gameState));
         }
-        
-        function getGemRandomItemWithBonus() {
-            const bonusItems = [
-                { type: 'bomb', prob: 25, icon: GEM_ICONS.bomb },
-                { type: 'skull', prob: 8, icon: GEM_ICONS.skull },
-                { type: 'gem', prob: 22, icon: GEM_ICONS.gem },
-                { type: 'key', prob: 22, icon: GEM_ICONS.key },
-                { type: 'diamond', prob: 18, icon: GEM_ICONS.diamond },
-                { type: 'bonus', prob: 5, icon: GEM_ICONS.bonus }
-            ];
+
+        // Handle Click - Fixed +1 only
+        function handleClick(e) {
+            if (gameState.isLocked) return;
             
-            const rand = Math.random() * 100;
-            let cumulative = 0;
-            for (let item of bonusItems) {
-                cumulative += item.prob;
-                if (rand < cumulative) return item;
-            }
-            return bonusItems[0];
-        }
-        
-        function calculateGemMultiplier(counts) {
-            let multiplier = 1.0;
+            const now = Date.now();
+            const timeDiff = now - lastClickTime;
             
-            if (counts.gem >= 3) {
-                if (counts.gem === 3) multiplier += 0.5;
-                else if (counts.gem === 4) multiplier += 0.75;
-                else if (counts.gem === 5) multiplier += 1.0;
-                else if (counts.gem === 6) multiplier += 1.25;
-                else if (counts.gem === 7) multiplier += 1.5;
-                else multiplier += 2.0;
-            }
-            
-            if (counts.key >= 4) {
-                if (counts.key === 4) multiplier += 0.5;
-                else if (counts.key === 5) multiplier += 1.0;
-                else if (counts.key === 6) multiplier += 1.5;
-                else if (counts.key === 7) multiplier += 2.0;
-                else if (counts.key === 8) multiplier += 2.5;
-                else multiplier += 3.0;
-            }
-            
-            if (counts.diamond >= 3) {
-                if (counts.diamond === 3) multiplier += 1.0;
-                else if (counts.diamond === 4) multiplier += 2.0;
-                else if (counts.diamond === 5) multiplier += 3.0;
-                else if (counts.diamond === 6) multiplier += 4.0;
-                else if (counts.diamond === 7) multiplier += 5.0;
-                else multiplier += 7.0;
-            }
-            
-            if (counts.skull > 0) {
-                multiplier += counts.skull * 0.05;
-            }
-            
-            if (counts.bomb > 0 && counts.bomb < 5) {
-                multiplier -= counts.bomb * 0.20;
-            }
-            
-            if (counts.bomb >= 5) {
-                return 0;
-            }
-            
-            return Math.max(0.1, multiplier);
-        }
-        
-        function updateGemSlotPrices() {
-            const bet = parseFloat(document.getElementById('gemSlotBet').value) || 1;
-            document.getElementById('gemSlotPrice1').textContent = (bet * 5).toFixed(2) + ' DL';
-            document.getElementById('gemSlotPrice10').textContent = (bet * 45).toFixed(2) + ' DL';
-        }
-        
-        function updateGemSlotBonusInfo() {
-            const infoDiv = document.getElementById('gemSlotBonusInfo');
-            if (gemSlotBonusTurns > 0 || gemSlotDiamondCount > 0) {
-                infoDiv.style.display = 'flex';
-                document.getElementById('gemSlotBonusTurns').textContent = gemSlotBonusTurns;
-                document.getElementById('gemSlotDiamondCount').textContent = gemSlotDiamondCount;
-            } else {
-                infoDiv.style.display = 'none';
-            }
-        }
-        
-        function buyGemSlotBonus(multiplier) {
-            if (gemSlotBonusTurns > 0) {
-                showGemSlotNotification('Selesaikan bonus dulu!', 'lose');
+            // Anti-cheat: Check time difference (too fast = bot)
+            if (timeDiff < 50) { // Less than 50ms between clicks
+                cpsWarningCount++;
+                if (cpsWarningCount >= WARNING_THRESHOLD) {
+                    lockAccount();
+                    return;
+                }
+                showNotification('⚠️', 'Terlalu cepat! Warning ' + cpsWarningCount + '/2');
                 return;
             }
             
-            const bet = parseFloat(document.getElementById('gemSlotBet').value) || 1;
-            const cost = multiplier === 1 ? bet * 5 : bet * 45;
+            lastClickTime = now;
+            clickTimes.push(now);
+            clickTimes = clickTimes.filter(t => now - t < 1000);
             
-            if (userBalance >= cost) {
-                userBalance -= cost;
-                gemSlotBonusTurns += multiplier;
-                gemSlotDiamondCount += multiplier * 5; // Bonus diamond
-                updateBalance();
-                updateWalletBalance();
-                updateGemSlotBonusInfo();
-                document.getElementById('gemSlotBet').disabled = true;
-                document.getElementById('gemSlotBonus1').disabled = true;
-                document.getElementById('gemSlotBonus10').disabled = true;
-                showGemSlotNotification(`🎁 Bonus ${multiplier}x dibeli!`, 'bonus');
-                sounds.bonus.play();
-            } else {
-                showGemSlotNotification('Saldo tidak cukup!', 'lose');
-            }
-        }
-        
-        function setGemSlotMode(mode) {
-            gemSlotMode = mode;
-            document.getElementById('gemSlotModeManual').classList.toggle('active', mode === 'manual');
-            document.getElementById('gemSlotModeAuto').classList.toggle('active', mode === 'auto');
+            const cps = clickTimes.length;
+            document.getElementById('clickSpeed').textContent = cps + ' CPS';
             
-            if (mode === 'auto') {
-                startAutoSpin();
-            } else {
-                stopAutoSpin();
-            }
-        }
-        
-        function startAutoSpin() {
-            if (gemSlotAutoActive) return;
-            
-            const count = parseInt(document.getElementById('gemSlotAutoCount').value) || 5;
-            gemSlotAutoCount = count;
-            gemSlotAutoActive = true;
-            
-            document.getElementById('gemSlotAutoStartBtn').disabled = true;
-            document.getElementById('gemSlotAutoStopBtn').disabled = false;
-            
-            spinGemSlot();
-        }
-        
-        function stopAutoSpin() {
-            gemSlotAutoActive = false;
-            gemSlotAutoCount = 0;
-            if (gemSlotAutoInterval) {
-                clearInterval(gemSlotAutoInterval);
-                gemSlotAutoInterval = null;
-            }
-            
-            document.getElementById('gemSlotAutoStartBtn').disabled = false;
-            document.getElementById('gemSlotAutoStopBtn').disabled = true;
-        }
-        
-        async function spinGemSlot() {
-            if (gemSlotGameActive) return;
-            
-            const betAmount = parseFloat(document.getElementById('gemSlotBet').value);
-            
-            if (betAmount < 0.1) {
-                showGemSlotNotification('Minimal taruhan 0.1 DL', 'lose');
-                if (gemSlotAutoActive) stopAutoSpin();
+            // Strict CPS check
+            if (cps > MAX_CPS) {
+                cpsWarningCount++;
+                document.getElementById('speedWarning').classList.remove('hidden');
+                
+                if (cpsWarningCount >= WARNING_THRESHOLD) {
+                    lockAccount();
+                    return;
+                }
+                
+                setTimeout(() => {
+                    document.getElementById('speedWarning').classList.add('hidden');
+                }, 2000);
                 return;
             }
             
-            if (gemSlotFreeSpins === 0 && betAmount > userBalance) {
-                showGemSlotNotification('Saldo tidak cukup!', 'lose');
-                if (gemSlotAutoActive) stopAutoSpin();
+            // Pattern detection: consistent timing
+            if (clickTimes.length > 8) {
+                const intervals = [];
+                for (let i = 1; i < clickTimes.length; i++) {
+                    intervals.push(clickTimes[i] - clickTimes[i-1]);
+                }
+                const avg = intervals.reduce((a,b) => a+b) / intervals.length;
+                const variance = intervals.reduce((sum, int) => sum + Math.abs(int - avg), 0) / intervals.length;
+                
+                // If too consistent (low variance), likely auto clicker
+                if (variance < 15 && intervals.length > 10) {
+                    lockAccount();
+                    return;
+                }
+            }
+            
+            // Valid click - always +1
+            gameState.coins += 1;
+            gameState.totalClicks++;
+            
+            // Visual
+            const x = e.clientX || (e.touches && e.touches[0].clientX) || window.innerWidth/2;
+            const y = e.clientY || (e.touches && e.touches[0].clientY) || window.innerHeight/2;
+            createFloatingCoin(x, y, '+1');
+            
+            // Button anim
+            const btn = document.getElementById('mainCoinBtn');
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => btn.style.transform = 'scale(1)', 100);
+            
+            saveGame();
+            updateDisplay();
+            checkAutoConvert();
+        }
+
+        // Lock Account
+        function lockAccount() {
+            gameState.isLocked = true;
+            saveGame();
+            document.getElementById('antiCheatOverlay').classList.remove('hidden');
+            document.getElementById('antiCheatOverlay').classList.add('flex');
+        }
+
+        function showAntiCheatLock() {
+            document.getElementById('antiCheatOverlay').classList.remove('hidden');
+            document.getElementById('antiCheatOverlay').classList.add('flex');
+        }
+
+        // Auto Convert
+        function startAutoConvert() {
+            setInterval(() => {
+                checkAutoConvert();
+            }, 1000);
+        }
+
+        function checkAutoConvert() {
+            if (gameState.coins >= 100) {
+                const convertAmount = Math.floor(gameState.coins / 100);
+                gameState.coins = gameState.coins % 100;
+                gameState.rupiah += convertAmount;
+                
+                showNotification('💱', `Auto: ${convertAmount * 100}c → Rp ${convertAmount}`);
+                saveGame();
+                updateDisplay();
+            }
+        }
+
+        // Floating Coin
+        function createFloatingCoin(x, y, text) {
+            const coin = document.createElement('div');
+            coin.className = 'floating-coin';
+            coin.textContent = text;
+            coin.style.left = (x - 20) + 'px';
+            coin.style.top = (y - 20) + 'px';
+            coin.style.color = '#ffd700';
+            document.getElementById('floatingCoins').appendChild(coin);
+            setTimeout(() => coin.remove(), 1000);
+        }
+
+        // Hourly Check
+        function startHourlyCheck() {
+            setInterval(() => {
+                if (Date.now() - gameState.lastHourlyCheck >= 3600000) {
+                    showHourlyModal();
+                }
+            }, 60000);
+        }
+
+        function showHourlyModal() {
+            document.getElementById('hourlyModal').classList.remove('hidden');
+            document.getElementById('hourlyModal').classList.add('flex');
+        }
+
+        function continuePlaying(continueGame) {
+            document.getElementById('hourlyModal').classList.add('hidden');
+            document.getElementById('hourlyModal').classList.remove('flex');
+            
+            if (continueGame) {
+                gameState.lastHourlyCheck = Date.now();
+                saveGame();
+            } else {
+                alert('Terima kasih telah bermain!');
+                location.reload();
+            }
+        }
+
+        // Session Timer
+        function startSessionTimer() {
+            setInterval(() => {
+                const elapsed = Math.floor((Date.now() - gameState.sessionStart) / 1000);
+                const h = Math.floor(elapsed / 3600).toString().padStart(2,'0');
+                const m = Math.floor((elapsed % 3600) / 60).toString().padStart(2,'0');
+                const s = (elapsed % 60).toString().padStart(2,'0');
+                document.getElementById('sessionTimer').textContent = `${h}:${m}:${s}`;
+            }, 1000);
+        }
+
+        // Create Kupon
+        function createKupon(amount) {
+            if (gameState.isLocked) return;
+            
+            // Check daily limit
+            const today = new Date().toDateString();
+            if (gameState.lastWithdrawDate !== today) {
+                gameState.todayWithdraw = 0;
+                gameState.lastWithdrawDate = today;
+            }
+            
+            if (gameState.todayWithdraw + amount > 20000) {
+                showNotification('❌', 'Limit harian tercapai!');
                 return;
             }
             
-            if (gemSlotFreeSpins === 0) {
-                userBalance -= betAmount;
-                updateBalance();
-                updateWalletBalance();
+            if (amount < 5000 || amount > 20000) {
+                showNotification('❌', 'Min Rp 5.000, Max Rp 20.000!');
+                return;
+            }
+            
+            if (gameState.rupiah < amount) {
+                showNotification('❌', 'Saldo tidak cukup!');
+                return;
+            }
+            
+            // Deduct immediately
+            gameState.rupiah -= amount;
+            gameState.todayWithdraw += amount;
+            gameState.totalKuponCreated++;
+            
+            // Generate kupon with security features
+            const kupon = {
+                id: Date.now(),
+                nomorSeri: 'CC' + String(gameState.totalKuponCreated).padStart(6, '0'),
+                amount: amount,
+                createdAt: new Date().toLocaleString('id-ID'),
+                claimed: false,
+                scratched: false,
+                securityCode: Math.random().toString(36).substring(2, 8).toUpperCase()
+            };
+            
+            gameState.kuponList.unshift(kupon);
+            
+            saveGame();
+            updateDisplay();
+            renderKuponList();
+            
+            // Show screenshot modal
+            showScreenshotModal();
+            
+            showNotification('🎫', `Kupon ${kupon.nomorSeri} dibuat! Screenshot sekarang!`);
+        }
+
+        function createKuponCustom() {
+            document.getElementById('customKuponModal').classList.remove('hidden');
+            document.getElementById('customKuponModal').classList.add('flex');
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customKuponModal').classList.add('hidden');
+            document.getElementById('customKuponModal').classList.remove('flex');
+        }
+
+        function confirmCustomKupon() {
+            const amount = parseInt(document.getElementById('customKuponAmount').value);
+            if (amount >= 5000 && amount <= 20000) {
+                closeCustomModal();
+                createKupon(amount);
             } else {
-                gemSlotFreeSpins--;
-            }
-            
-            gemSlotGameActive = true;
-            document.getElementById('gemSlotSpinBtn').disabled = true;
-            
-            // Play spin sound
-            sounds.spin.currentTime = 0;
-            sounds.spin.play();
-            
-            // Generate results
-            const results = [];
-            for (let i = 0; i < 15; i++) {
-                if (gemSlotBonusTurns > 0) {
-                    results.push(getGemRandomItemWithBonus());
-                } else {
-                    results.push(getGemRandomItem());
-                }
-            }
-            
-            // Count symbols
-            const counts = { bomb:0, skull:0, gem:0, key:0, diamond:0, bonus:0 };
-            results.forEach(r => counts[r.type]++);
-            
-            // Check bonus trigger
-            if (counts.bonus >= 3 && gemSlotBonusTurns === 0) {
-                gemSlotBonusTurns += 5;
-                showGemSlotNotification('🎁 BONUS TRIGGERED! +5 turns', 'bonus');
-                sounds.bonus.play();
-            }
-            
-            gemSlotDiamondCount += counts.diamond;
-            
-            let multiplier = calculateGemMultiplier(counts);
-            
-            if (gemSlotFreeSpins > 0) {
-                multiplier *= 2;
-            }
-            
-            const winAmount = betAmount * multiplier;
-            
-            // Animate reels
-            const promises = [];
-            let index = 0;
-            for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 5; col++) {
-                    const reel = document.getElementById(`gemReel-${row}-${col}`);
-                    if (reel) {
-                        promises.push(spinGemReel(reel, results[index].icon, 1.2 + Math.random() * 0.4));
-                    }
-                    index++;
-                }
-            }
-            
-            await Promise.all(promises);
-            
-            // Update result
-            if (multiplier > 0 && winAmount > 0) {
-                if (gemSlotFreeSpins === 0) {
-                    userBalance += winAmount;
-                    updateBalance();
-                    updateWalletBalance();
-                }
-                document.getElementById('gemSlotPayout').innerHTML = winAmount.toFixed(2) + ' <i class="fas fa-rocket" style="color:#7c5fcf;"></i>';
-                document.getElementById('gemSlotResultText').innerHTML = `MENANG <span style="color:#2fb77e;font-weight:700;">+${winAmount.toFixed(2)} DL</span> (${multiplier.toFixed(2)}x)`;
-                
-                // Play win sound
-                sounds.win.currentTime = 0;
-                sounds.win.play();
-                
-                // Check for big wins
-                if (multiplier >= 10) {
-                    showBigWin('SENSATIONAL', winAmount, multiplier);
-                } else if (multiplier >= 5) {
-                    showBigWin('MEGA WIN', winAmount, multiplier);
-                } else if (multiplier >= 3) {
-                    showBigWin('BIG WIN', winAmount, multiplier);
-                }
-            } else if (multiplier === 0) {
-                document.getElementById('gemSlotPayout').innerHTML = '0.00 <i class="fas fa-rocket" style="color:#7c5fcf;"></i>';
-                document.getElementById('gemSlotResultText').innerHTML = `KALAH <span style="color:#f25a5a;font-weight:700;">-${betAmount.toFixed(2)} DL</span> (5+ BOMB)`;
-                
-                // Play lose sound
-                sounds.lose.currentTime = 0;
-                sounds.lose.play();
-            } else {
-                document.getElementById('gemSlotPayout').innerHTML = '0.00 <i class="fas fa-rocket" style="color:#7c5fcf;"></i>';
-                document.getElementById('gemSlotResultText').innerHTML = `KALAH <span style="color:#f25a5a;font-weight:700;">-${betAmount.toFixed(2)} DL</span>`;
-                
-                // Play lose sound
-                sounds.lose.currentTime = 0;
-                sounds.lose.play();
-            }
-            
-            if (gemSlotBonusTurns > 0) {
-                gemSlotBonusTurns--;
-            }
-            
-            if (gemSlotBonusTurns === 0) {
-                document.getElementById('gemSlotBet').disabled = false;
-                document.getElementById('gemSlotBonus1').disabled = false;
-                document.getElementById('gemSlotBonus10').disabled = false;
-            }
-            
-            updateGemSlotBonusInfo();
-            
-            gemSlotGameActive = false;
-            document.getElementById('gemSlotSpinBtn').disabled = false;
-            
-            // Auto spin next
-            if (gemSlotAutoActive) {
-                gemSlotAutoCount--;
-                if (gemSlotAutoCount > 0) {
-                    gemSlotAutoInterval = setTimeout(() => spinGemSlot(), 2000);
-                } else {
-                    stopAutoSpin();
-                }
+                showNotification('❌', 'Nominal harus Rp 5.000 - 20.000!');
             }
         }
-        
-        async function spinGemReel(reelElement, targetIcon, duration) {
-            return new Promise(resolve => {
-                const itemHeight = 55;
-                const totalItems = reelElement.children.length;
-                
-                let targetIndex = 0;
-                for (let i = 0; i < totalItems; i++) {
-                    const img = reelElement.children[i].querySelector('img');
-                    if (img && img.src === targetIcon) {
-                        targetIndex = i;
-                        break;
-                    }
-                }
-                
-                const computedStyle = window.getComputedStyle(reelElement);
-                const transform = computedStyle.transform;
-                let currentY = 0;
-                
-                if (transform && transform !== 'none') {
-                    const matrix = transform.match(/matrix.*\((.+)\)/);
-                    if (matrix) {
-                        const values = matrix[1].split(', ');
-                        currentY = parseFloat(values[5]) || 0;
-                    }
-                }
-                
-                const currentItemIndex = Math.round(Math.abs(currentY) / itemHeight) % totalItems;
-                
-                let distance;
-                if (targetIndex > currentItemIndex) {
-                    distance = (targetIndex - currentItemIndex) + (totalItems * 3);
-                } else {
-                    distance = (totalItems - currentItemIndex + targetIndex) + (totalItems * 3);
-                }
-                
-                const targetY = -itemHeight * (currentItemIndex + distance);
-                
-                gsap.killTweensOf(reelElement);
-                
-                gsap.to(reelElement, {
-                    y: targetY,
-                    duration: duration,
-                    ease: "power3.out",
-                    modifiers: {
-                        y: (y) => {
-                            const pos = parseFloat(y);
-                            const wrapped = pos % (itemHeight * totalItems);
-                            return wrapped + "px";
-                        }
-                    },
-                    onComplete: () => {
-                        const finalY = -itemHeight * targetIndex;
-                        gsap.set(reelElement, { y: finalY });
-                        resolve();
-                    }
-                });
-            });
+
+        // Screenshot Modal
+        function showScreenshotModal() {
+            document.getElementById('ssModal').classList.remove('hidden');
+            document.getElementById('ssModal').classList.add('flex');
         }
-        
-        function showGemSlotNotification(message, type) {
-            const notif = document.createElement('div');
-            notif.className = `notification ${type}`;
-            notif.innerHTML = `<span>${message}</span>`;
-            document.body.appendChild(notif);
-            setTimeout(() => {
-                notif.style.opacity = '0';
-                setTimeout(() => notif.remove(), 300);
-            }, 2000);
+
+        function closeSsModal() {
+            document.getElementById('ssModal').classList.add('hidden');
+            document.getElementById('ssModal').classList.remove('flex');
         }
-        
-        function showBigWin(title, amount, multiplier) {
-            const overlay = document.createElement('div');
-            overlay.className = 'big-win-overlay';
+
+        // Render Kupon with Screenshot Required Design
+        function renderKuponList() {
+            const container = document.getElementById('kuponList');
             
-            let titleClass = 'big';
-            if (title === 'MEGA WIN') titleClass = 'mega';
-            if (title === 'SENSATIONAL') titleClass = 'sensational';
+            if (gameState.kuponList.length === 0) {
+                container.innerHTML = '<p class="text-center text-purple-300 text-sm py-4">Belum ada kupon</p>';
+                return;
+            }
             
-            overlay.innerHTML = `
-                <div class="big-win-content">
-                    <div class="big-win-title ${titleClass}">${title}</div>
-                    <div class="big-win-amount">+${amount.toFixed(2)} DL</div>
-                    <div class="big-win-multiplier">${multiplier.toFixed(2)}x Multiplier</div>
+            container.innerHTML = gameState.kuponList.map(k => `
+                <div class="kupon-card rounded-xl p-4 relative ss-required" id="kupon-${k.id}">
+                    <div class="kupon-watermark">VALID</div>
+                    
+                    <div class="relative z-10">
+                        <!-- Header -->
+                        <div class="flex justify-between items-start mb-3 border-b border-white/20 pb-2">
+                            <div>
+                                <div class="text-xs text-blue-200 uppercase tracking-wider">No. Seri</div>
+                                <div class="kupon-number text-2xl font-bold text-yellow-300">${k.nomorSeri}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="claim-badge text-white text-xs px-3 py-1 rounded-full">
+                                    CLAIM VIA WA
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Amount -->
+                        <div class="text-center mb-3">
+                            <div class="text-xs text-blue-200">NOMINAL</div>
+                            <div class="text-3xl font-bold text-green-400">Rp ${k.amount.toLocaleString()}</div>
+                        </div>
+                        
+                        <!-- Security Info -->
+                        <div class="bg-black/40 rounded-lg p-2 mb-3">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-blue-200">Security Code:</span>
+                                <span class="font-mono text-yellow-300 font-bold">${k.securityCode}</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-blue-200">Dibuat:</span>
+                                <span class="text-white">${k.createdAt}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Screenshot Warning -->
+                        <div class="bg-red-500/30 border-2 border-red-400 rounded-lg p-2 text-center mb-2">
+                            <i class="fas fa-camera text-red-400 mr-1"></i>
+                            <span class="text-xs font-bold text-red-300">SCREENSHOT SEBELUM MENUTUP!</span>
+                        </div>
+                        
+                        <!-- WA Info -->
+                        <div class="flex items-center justify-center gap-2 bg-green-500/20 rounded-lg p-2">
+                            <i class="fab fa-whatsapp text-green-400"></i>
+                            <span class="text-sm font-bold">0813-9674-1367</span>
+                        </div>
+                        
+                        ${k.claimed ? `
+                            <div class="absolute inset-0 bg-gray-900/90 rounded-xl flex items-center justify-center z-20">
+                                <div class="text-center">
+                                    <i class="fas fa-check-double text-4xl text-green-400 mb-2"></i>
+                                    <div class="font-bold text-white">SUDAH DICLAIM</div>
+                                    <div class="text-xs text-gray-400 mt-1">${k.claimedAt || ''}</div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
                 </div>
-            `;
+            `).join('');
+        }
+
+        // Update Display
+        function updateDisplay() {
+            document.getElementById('coinDisplay').textContent = gameState.coins.toLocaleString();
+            document.getElementById('autoConvertProgress').textContent = gameState.coins;
+            document.getElementById('rupiahDisplay').textContent = 'Rp ' + gameState.rupiah.toLocaleString();
+            document.getElementById('createSaldo').textContent = 'Rp ' + gameState.rupiah.toLocaleString();
+            document.getElementById('todayWithdraw').textContent = 'Hari ini: Rp ' + gameState.todayWithdraw.toLocaleString();
+            document.getElementById('totalClicksDisplay').textContent = gameState.totalClicks.toLocaleString();
+            document.getElementById('kuponCount').textContent = gameState.kuponList.filter(k => !k.claimed).length;
+            document.getElementById('totalKupon').textContent = gameState.kuponList.length;
             
-            document.body.appendChild(overlay);
-            
-            // Play big win sound
-            sounds.bigWin.currentTime = 0;
-            sounds.bigWin.play();
+            // Limit bar
+            const limitPercent = (gameState.todayWithdraw / 20000) * 100;
+            document.getElementById('limitBar').style.width = limitPercent + '%';
+            document.getElementById('limitText').textContent = `Rp ${gameState.todayWithdraw.toLocaleString()} / 20.000`;
+        }
+
+        // Notification
+        function showNotification(icon, text) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notifIcon').textContent = icon;
+            document.getElementById('notifText').textContent = text;
+            notif.classList.remove('hidden');
+            notif.classList.add('flex');
             
             setTimeout(() => {
-                overlay.remove();
+                notif.classList.add('hidden');
+                notif.classList.remove('flex');
             }, 3000);
         }
 
-        // ===== NAVIGATION =====
-        function showHome() { 
-            hideAllPages(); 
-            document.getElementById('homePage').style.display = 'block'; 
-            setActiveNav(1); 
-        }
-        
-        function openGemSlot() { 
-            if (!loggedInUser) { showModal('login'); return; } 
-            hideAllPages(); 
-            document.getElementById('gemSlotPage').style.display = 'block'; 
-            setActiveNav(1); 
-            initGemSlot();
-            updateGemSlotPrices();
-            updateGemSlotBonusInfo();
-        }
-        
-        function openReme() { 
-            if (!loggedInUser) { showModal('login'); return; } 
-            hideAllPages(); 
-            document.getElementById('remePage').style.display = 'block'; 
-            setActiveNav(1); 
-        }
-        
-        function openMines() { 
-            if (!loggedInUser) { showModal('login'); return; } 
-            hideAllPages(); 
-            document.getElementById('minesPage').style.display = 'block'; 
-            setActiveNav(1); 
-        }
-        
-        function openTowers() { 
-            if (!loggedInUser) { showModal('login'); return; } 
-            hideAllPages(); 
-            document.getElementById('towersPage').style.display = 'block'; 
-            setActiveNav(1); 
-        }
-        
-        function openLimbo() { 
-            if (!loggedInUser) { showModal('login'); return; } 
-            hideAllPages(); 
-            document.getElementById('limboPage').style.display = 'block'; 
-            setActiveNav(1); 
-        }
-        
-        function openBonus() { 
-            if (!loggedInUser) { showModal('login'); return; } 
-            hideAllPages(); 
-            document.getElementById('bonusPage').style.display = 'block'; 
-            setActiveNav(0); 
-        }
-        
-        function openWallet() { 
-            if (!loggedInUser) { showModal('login'); return; } 
-            hideAllPages(); 
-            document.getElementById('walletPage').style.display = 'block'; 
-            setActiveNav(2); 
-            updateWalletBalance();
-        }
-
-        function openChat() { 
-            if (!loggedInUser) { showModal('login'); return; } 
-            hideAllPages(); 
-            document.getElementById('chatPage').style.display = 'block'; 
-            setActiveNav(3); 
-        }
-        
-        function openProfile() { 
-            if (!loggedInUser) { showModal('login'); return; } 
-            hideAllPages(); 
-            document.getElementById('profilePage').style.display = 'block'; 
-            setActiveNav(4); 
-        }
-
-        function hideAllPages() {
-            const pages = ['homePage','remePage','minesPage','towersPage','limboPage','bonusPage','walletPage','chatPage','profilePage','gemSlotPage'];
-            pages.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-        }
-
-        function setActiveNav(index) {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach((el, i) => {
-                if (i === index) el.classList.add('active');
-                else el.classList.remove('active');
-            });
-        }
-
-        function updateBalance() {
-            document.getElementById('balanceAmount').textContent = userBalance.toFixed(2);
-        }
-
-        function updateWalletBalance() {
-            const walletBalance = document.getElementById('walletBalanceAmount');
-            if (walletBalance) walletBalance.textContent = userBalance.toFixed(2);
-        }
-
-        // ===== PROMO FUNCTIONS =====
-        function openPromoModal() {
-            document.getElementById('promoModal').classList.add('active');
-        }
-
-        function closePromoModal() {
-            document.getElementById('promoModal').classList.remove('active');
-        }
-
-        function redeemPromoCode() {
-            alert('Fitur promo dalam pengembangan');
-            closePromoModal();
-        }
-
-        // ===== AUTH FUNCTIONS =====
-        function showModal(mode) {
-            alert('Silakan login/register');
-        }
-        
-        function closeModal() {}
-
-        // ===== INIT =====
+        // Initialize
         window.onload = function() {
-            updateBalance();
-            showHome();
-            initGemSlot();
+            loadGame();
+            renderKuponList();
             
-            // Preload images
-            Object.values(GEM_ICONS).forEach(src => {
-                const img = new Image();
-                img.src = src;
+            // Touch support
+            const btn = document.getElementById('mainCoinBtn');
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleClick(e);
             });
         };
+
+        // Prevent right click on kupon
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // Prevent DevTools
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key))) {
+                e.preventDefault();
+                showNotification('🛡️', 'Developer Tools diblokir!');
+            }
+        });
+
+        // Auto save
+        setInterval(saveGame, 3000);
     </script>
 </body>
 </html>
